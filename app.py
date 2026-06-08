@@ -9,19 +9,28 @@ from sklearn.linear_model import LinearRegression
 # =====================================================================
 # CONFIGURAÇÃO DE PÁGINA E ESTILOS CSS
 # =====================================================================
-st.set_page_config(page_title="Simulador de Crédito", layout="centered")
+st.set_page_config(page_title="Motor Consignado IA", layout="centered", page_icon="🏦")
 
 st.markdown("""
 <style>
-    /* Estilo Minimalista */
-    .stApp { background-color: #f8f9fa; }
-    h1, h2, h3 { color: #1a1a1a; font-family: 'Inter', sans-serif; }
-    [data-testid="stMetricValue"] { font-size: 1.2rem !important; color: #2c3e50; }
-    [data-testid="stMetricLabel"] { font-size: 0.8rem !important; color: #7f8c8d; }
-    .stButton>button { border: 1px solid #2c3e50; background: white; color: #2c3e50; border-radius: 0; }
-    .stButton>button:hover { background: #2c3e50; color: white; }
+    /* ajusta o tamanho do número principal para evitar corte */
+    [data-testid="stMetricValue"] {
+        font-size: 1.4rem !important;
+    }
+    /* ajusta o título do cartão e permite quebra de linha se necessário */
+    [data-testid="stMetricLabel"] {
+        font-size: 0.9rem !important;
+        white-space: normal !important; 
+    }
+    /* ajusta o tamanho do indicador de diferença (delta) */
+    [data-testid="stMetricDelta"] {
+        font-size: 0.85rem !important;
+    }
 </style>
 """, unsafe_allow_html=True)
+
+st.title("🏦 Simulador de Crédito Consignado IA")
+st.markdown("Descubra a estrutura ideal de crédito utilizando Inteligência Artificial para otimizar prazos e taxas.")
 
 st.title("🏦 Simulador de Crédito Consignado IA")
 st.markdown("Descubra a estrutura ideal de crédito utilizando Inteligência Artificial para otimizar prazos e taxas.")
