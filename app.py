@@ -7,6 +7,32 @@ from math import floor
 from sklearn.linear_model import LinearRegression
 
 # =====================================================================
+# CONFIGURAÇÃO DE PÁGINA E ESTILOS CSS
+# =====================================================================
+st.set_page_config(page_title="Motor Consignado IA", layout="centered", page_icon="🏦")
+
+st.markdown("""
+<style>
+    /* ajusta o tamanho do número principal para evitar corte */
+    [data-testid="stMetricValue"] {
+        font-size: 1.4rem !important;
+    }
+    /* ajusta o título do cartão e permite quebra de linha se necessário */
+    [data-testid="stMetricLabel"] {
+        font-size: 0.9rem !important;
+        white-space: normal !important; 
+    }
+    /* ajusta o tamanho do indicador de diferença (delta) */
+    [data-testid="stMetricDelta"] {
+        font-size: 0.85rem !important;
+    }
+</style>
+""", unsafe_allow_html=True)
+
+st.title("🏦 Simulador de Crédito Consignado IA")
+st.markdown("Descubra a estrutura ideal de crédito utilizando Inteligência Artificial para otimizar prazos e taxas.")
+
+# =====================================================================
 # 1. MOTOR DE DADOS E TREINAMENTO (COM CACHE DE MEMÓRIA)
 # =====================================================================
 @st.cache_resource(ttl=86400, show_spinner="Construindo inteligência do motor (conectando ao BCB)...")
@@ -53,7 +79,7 @@ def preparar_motor():
     
     return modelo, estado_atual, prazo_maximo
 
-# Executa o cache no carregamento
+# Instancia o motor na memória
 modelo_base, estado, prazo_maximo_mercado = preparar_motor()
 
 # =====================================================================
@@ -110,16 +136,8 @@ def otimizar_contrato_ag(usa_fgts, saldo_fgts, volume, salario_liquido):
     return melhor_prazo, taxa_m * 100, pmt_f
 
 # =====================================================================
-# 3. INTERFACE DE USUÁRIO (FRONTEND STREAMLIT)
+# 3. INTERFACE DE USUÁRIO E EXECUÇÃO
 # =====================================================================
-st.set_page_config(page_title="Motor Consignado IA", layout="centered", page_icon="🏦")
-
-st.title("🏦 Simulador de Crédito Consignado IA")
-st.markdown("Descubra a estrutura ideal de crédito utilizando Inteligência Artificial para otimizar prazos e taxas.")
-
-# ---------------------------------------------------------
-# NOVO: PANORAMA DE MERCADO (Dados em Tempo Real do BCB)
-# ---------------------------------------------------------
 st.markdown("### 📊 Panorama Atual do Mercado")
 st.caption("Valores médios praticados atualmente no Brasil para crédito consignado privado (Fonte: Banco Central do Brasil)")
 
@@ -130,10 +148,6 @@ with col_pan2:
     st.info(f"**Prazo Médio Contratado:**\n### {int(estado['prazo_medio_mercado'])} meses")
 
 st.markdown("---")
-
-# ---------------------------------------------------------
-# ÁREA DE CONFIGURAÇÃO DO USUÁRIO
-# ---------------------------------------------------------
 st.markdown("### ⚙️ Configure sua Simulação")
 
 col1, col2, col3 = st.columns(3)
@@ -146,53 +160,70 @@ with col3:
 
 st.markdown("<br>", unsafe_allow_html=True)
 
-# ---------------------------------------------------------
-# BOTÃO DE EXECUÇÃO E RESULTADOS
-# ---------------------------------------------------------
 if st.button("🚀 Executar Simulação Preditiva", type="primary", use_container_width=True):
     
+    # Cálculo do Teto de Crédito
     margem_maxima = salario_liquido_usuario * 0.35
     taxa_ref = estado['taxa_consignado_inss'] / 100
     teto_credito = (margem_maxima * ((1 + taxa_ref)**prazo_maximo_mercado - 1)) / (taxa_ref * (1 + taxa_ref)**prazo_maximo_mercado)
     
+    valor_simulacao = valor_emprestimo
     if valor_emprestimo > teto_credito:
-        st.error(f"⚠️ **Operação Recusada!** O valor solicitado ultrapassa a margem consignável legal permitida (35%). \n\n**Teto máximo estimado:** R$ {teto_credito:,.2f}")
-    else:
-        with st.spinner("Otimizando contratos via Algoritmo Genético..."):
-            p_sem, t_sem, pmt_sem = otimizar_contrato_ag(0, 0, valor_emprestimo, salario_liquido_usuario)
-            p_com, t_com, pmt_com = otimizar_contrato_ag(1, saldo_fgts_usuario, valor_emprestimo, salario_liquido_usuario)
+        st.warning(f"⚠️ **Ajuste de Margem Legal:** O valor solicitado (R$ {valor_emprestimo:,.2f}) excede sua capacidade de pagamento (35% da renda). A simulação prosseguirá com o limite máximo permitido: **R$ {teto_credito:,.2f}**.")
+        valor_simulacao = teto_credito
+
+    with st.spinner("Otimizando contratos via Algoritmo Genético..."):
+        p_sem, t_sem, pmt_sem = otimizar_contrato_ag(0, 0, valor_simulacao, salario_liquido_usuario)
+        p_com, t_com, pmt_com = otimizar_contrato_ag(1, saldo_fgts_usuario, valor_simulacao, salario_liquido_usuario)
+        
+        st.markdown("---")
+        st.markdown("## 🎯 Resultados da Otimização")
+        
+        # CENÁRIO A
+        st.error("#### 🔴 CENÁRIO A - MERCADO LIVRE (SEM GARANTIA)")
+        st.markdown("Contrato padrão simulado sem a utilização do FGTS.")
+        
+        c1, c2, c3 = st.columns(3)
+        c1.metric("Prazo Ideal", f"{p_sem} meses")
+        c2.metric("Taxa de Juros", f"{t_sem:.2f}% a.m.")
+        c3.metric("Parcela Mensal", f"R$ {pmt_sem:,.2f}")
+        
+        c4, c5 = st.columns(2)
+        c4.metric("Valor Liberado", f"R$ {valor_simulacao:,.2f}")
+        juros_totais_sem = (pmt_sem * p_sem) - valor_simulacao
+        c5.metric("Juros Totais Pagos", f"R$ {juros_totais_sem:,.2f}")
+        
+        st.markdown("<br>", unsafe_allow_html=True)
+        
+        # CENÁRIO B
+        if saldo_fgts_usuario >= valor_simulacao:
+            st.success("#### 🟢 CENÁRIO B - HÍBRIDO (GARANTIA INTEGRAL DO FGTS)")
+            st.markdown("Saldo do FGTS cobre 100% do crédito.")
+        elif saldo_fgts_usuario > 0:
+            st.warning(f"#### 🟡 CENÁRIO B - HÍBRIDO (COM GARANTIA DO FGTS PARCIAL DE R$ {saldo_fgts_usuario:,.2f})")
+            st.markdown("Contrato otimizado utilizando seu saldo como redutor de risco.")
+            
+        if saldo_fgts_usuario > 0:
+            c1, c2, c3 = st.columns(3)
+            c1.metric("Prazo Ideal", f"{p_com} meses", f"{p_com - p_sem} meses", delta_color="inverse")
+            c2.metric("Taxa de Juros", f"{t_com:.2f}% a.m.", f"{t_com - t_sem:.2f}%", delta_color="inverse")
+            c3.metric("Parcela Mensal", f"R$ {pmt_com:,.2f}", f"R$ {pmt_com - pmt_sem:,.2f}", delta_color="inverse")
+            
+            c4, c5 = st.columns(2)
+            c4.metric("Valor Liberado", f"R$ {valor_simulacao:,.2f}")
+            juros_totais_com = (pmt_com * p_com) - valor_simulacao
+            c5.metric("Juros Totais Pagos", f"R$ {juros_totais_com:,.2f}", f"R$ {juros_totais_com - juros_totais_sem:,.2f}", delta_color="inverse")
             
             st.markdown("---")
-            st.markdown("## 🎯 Resultados da Otimização")
+            st.markdown("#### 💡 ECONOMIA AO UTILIZAR O FGTS:")
+            meses_economizados = p_sem - p_com
+            economia_financeira = juros_totais_sem - juros_totais_com
             
-            # CENÁRIO A
-            st.error("#### 🔴 Cenário A: Mercado Livre (Sem Garantia)")
-            st.markdown("Contrato padrão simulado sem a utilização do FGTS.")
-            c1, c2, c3, c4 = st.columns(4)
-            c1.metric("Prazo Ideal", f"{p_sem} meses")
-            c2.metric("Taxa Estimada", f"{t_sem:.2f}% a.m.")
-            c3.metric("Parcela", f"R$ {pmt_sem:,.2f}")
-            c4.metric("Juros Totais", f"R$ {(pmt_sem*p_sem)-valor_emprestimo:,.2f}")
+            if meses_economizados > 0:
+                st.success(f"⏳ **Tempo de Contrato:** Você quita a sua dívida **{meses_economizados} meses MAIS RÁPIDO!**")
             
-            st.markdown("<br>", unsafe_allow_html=True)
+            if economia_financeira > 0:
+                st.success(f"💰 **Juros Poupados:** Você deixa de pagar **R$ {economia_financeira:,.2f}** para o banco!")
             
-            # CENÁRIO B
-            if saldo_fgts_usuario >= valor_emprestimo:
-                st.success("#### 🟢 Cenário B: Garantia Integral do FGTS")
-                st.markdown("Contrato otimizado com o saldo do FGTS cobrindo 100% do risco.")
-            elif saldo_fgts_usuario > 0:
-                st.warning(f"#### 🟡 Cenário B: Garantia Híbrida (FGTS Parcial)")
-                st.markdown(f"Contrato otimizado utilizando R$ {saldo_fgts_usuario:,.2f} de garantia do FGTS.")
-                
-            if saldo_fgts_usuario > 0:
-                c1, c2, c3, c4 = st.columns(4)
-                # Adicionamos deltas para mostrar a diferença (economia/redução) em relação ao Cenário A
-                c1.metric("Prazo Ideal", f"{p_com} meses", f"{p_com - p_sem} meses", delta_color="inverse")
-                c2.metric("Taxa Estimada", f"{t_com:.2f}% a.m.", f"{t_com - t_sem:.2f}%", delta_color="inverse")
-                c3.metric("Parcela", f"R$ {pmt_com:,.2f}", f"R$ {pmt_com - pmt_sem:,.2f}", delta_color="inverse")
-                
-                economia = ((pmt_sem*p_sem)-valor_emprestimo) - ((pmt_com*p_com)-valor_emprestimo)
-                c4.metric("Economia Juros", f"R$ {economia:,.2f}", "Dinheiro salvo!")
-                
-            else:
-                st.info("Cenário B Indisponível: Saldo do FGTS zerado. O contrato só pode ser realizado via Mercado Livre.")
+        else:
+            st.info("Cenário B Indisponível: Saldo do FGTS zerado. O contrato só pode ser realizado via Mercado Livre.")
