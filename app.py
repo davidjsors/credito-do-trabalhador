@@ -29,7 +29,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-st.title("Simulador de Crédito Consignado com IA")
+st.title("Simulador de Crédito Consignado")
 st.markdown("Descubra a estrutura ideal de crédito utilizando Inteligência Artificial para otimizar prazos e taxas.")
 
 # =====================================================================
