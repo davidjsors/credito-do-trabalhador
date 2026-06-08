@@ -157,7 +157,7 @@ def otimizar_contrato_ag(usa_fgts, saldo_fgts, volume, salario_liquido):
 # =====================================================================
 # 3. INTERFACE DE USUÁRIO E EXECUÇÃO
 # =====================================================================
-st.markdown("### 📊 Panorama Atual do Mercado")
+st.markdown("### Panorama Atual do Mercado")
 st.caption("Valores médios praticados atualmente no Brasil para crédito consignado privado (Fonte: Banco Central do Brasil)")
 
 col_pan1, col_pan2 = st.columns(2)
@@ -167,7 +167,7 @@ with col_pan2:
     st.info(f"**Prazo Médio Contratado:**\n### {int(estado['prazo_medio_mercado'])} meses")
 
 st.markdown("---")
-st.markdown("### ⚙️ Configure sua Simulação")
+st.markdown("### Configure sua Simulação")
 
 col1, col2, col3 = st.columns(3)
 with col1: 
