@@ -169,7 +169,7 @@ if st.button("🚀 Executar Simulação Preditiva", type="primary", use_containe
     
     valor_simulacao = valor_emprestimo
     if valor_emprestimo > teto_credito:
-        st.warning(f"⚠️ **Ajuste de Margem Legal:** O valor solicitado (R$ {valor_emprestimo:,.2f}) excede sua capacidade de pagamento (35% da renda). A simulação prosseguirá com o limite máximo permitido: **R$ {teto_credito:,.2f}**.")
+        st.warning(f"⚠️ **Ajuste de Margem Legal:** O valor solicitado (R\$ {valor_emprestimo:,.2f}) excede sua capacidade de pagamento (35% da renda). A simulação prosseguirá com o limite máximo permitido: **R\$ {teto_credito:,.2f}**.")
         valor_simulacao = teto_credito
 
     with st.spinner("Otimizando contratos via Algoritmo Genético..."):
