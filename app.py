@@ -32,9 +32,6 @@ st.markdown("""
 st.title("🏦 Simulador de Crédito Consignado IA")
 st.markdown("Descubra a estrutura ideal de crédito utilizando Inteligência Artificial para otimizar prazos e taxas.")
 
-st.title("🏦 Simulador de Crédito Consignado IA")
-st.markdown("Descubra a estrutura ideal de crédito utilizando Inteligência Artificial para otimizar prazos e taxas.")
-
 # =====================================================================
 # SIDEBAR: MANUAL DE NEGOCIAÇÃO
 # =====================================================================
