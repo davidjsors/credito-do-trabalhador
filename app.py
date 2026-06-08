@@ -29,7 +29,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-st.title("🏦 Simulador de Crédito Consignado IA")
+st.title("Simulador de Crédito Consignado com IA")
 st.markdown("Descubra a estrutura ideal de crédito utilizando Inteligência Artificial para otimizar prazos e taxas.")
 
 # =====================================================================
@@ -44,9 +44,9 @@ with st.sidebar:
     st.divider()
     st.header("Como negociar")
     st.markdown("""
-    1. **Compare:** Utilize a taxa média do mercado como âncora.
-    2. **Otimize:** O modelo ajusta automaticamente o prazo ideal para minimizar o custo efetivo total.
-    3. **Alavanque:** A garantia do FGTS atua como redutor de risco. Utilize a economia gerada para abater juros ou reduzir o tempo de contrato.
+    1. **Compare:** utilize a taxa média do mercado como âncora.
+    2. **Otimize:** o modelo ajusta automaticamente o prazo ideal para minimizar o custo efetivo total.
+    3. **Alavanque:** a garantia do FGTS atua como redutor de risco. Utilize a economia gerada para abater juros ou reduzir o tempo de contrato.
     """)
     st.divider()
     st.caption("Desenvolvido para análise independente de taxas bancárias.")
