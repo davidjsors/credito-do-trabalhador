@@ -207,12 +207,14 @@ if st.button("🚀 Executar Simulação Preditiva", type="primary", use_containe
             c1, c2, c3 = st.columns(3)
             c1.metric("Prazo Ideal", f"{p_com} meses", f"{p_com - p_sem} meses", delta_color="inverse")
             c2.metric("Taxa de Juros", f"{t_com:.2f}% a.m.", f"{t_com - t_sem:.2f}%", delta_color="inverse")
-            c3.metric("Parcela Mensal", f"R$ {pmt_com:,.2f}", f"R$ {pmt_com - pmt_sem:,.2f}", delta_color="inverse")
+            # Removido o "R$" do delta para o Streamlit colorir de verde corretamente
+            c3.metric("Parcela Mensal", f"R$ {pmt_com:,.2f}", f"{pmt_com - pmt_sem:,.2f}", delta_color="inverse")
             
             c4, c5 = st.columns(2)
             c4.metric("Valor Liberado", f"R$ {valor_simulacao:,.2f}")
             juros_totais_com = (pmt_com * p_com) - valor_simulacao
-            c5.metric("Juros Totais Pagos", f"R$ {juros_totais_com:,.2f}", f"R$ {juros_totais_com - juros_totais_sem:,.2f}", delta_color="inverse")
+            # Removido o "R$" do delta aqui também
+            c5.metric("Juros Totais Pagos", f"R$ {juros_totais_com:,.2f}", f"{juros_totais_com - juros_totais_sem:,.2f}", delta_color="inverse")
             
             st.markdown("---")
             st.markdown("#### 💡 ECONOMIA AO UTILIZAR O FGTS:")
